@@ -1,0 +1,65 @@
+---
+global:
+  security:
+    allowInsecureImages: true
+
+image:
+  registry: docker.io
+  repository: bitnamilegacy/mysql
+  tag: latest
+  pullPolicy: IfNotPresent
+
+architecture: replication
+
+auth:
+  rootPassword: replace-in-local-file
+  database: java_app_db
+  username: java_app_user
+  password: replace-in-local-file
+  replicationPassword: replace-in-local-file
+
+primary:
+  nodeSelector:
+    workload-type: ec2
+
+  persistence:
+    enabled: true
+    storageClass: gp3
+    accessModes:
+      - ReadWriteOnce
+    size: 8Gi
+
+  resources:
+    requests:
+      cpu: 250m
+      memory: 512Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+secondary:
+  replicaCount: 2
+
+  nodeSelector:
+    workload-type: ec2
+
+  persistence:
+    enabled: true
+    storageClass: gp3
+    accessModes:
+      - ReadWriteOnce
+    size: 8Gi
+
+  resources:
+    requests:
+      cpu: 200m
+      memory: 384Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+service:
+  type: ClusterIP
+
+metrics:
+  enabled: false

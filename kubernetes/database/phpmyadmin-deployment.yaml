@@ -1,0 +1,81 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+
+metadata:
+  name: phpmyadmin
+  namespace: database
+  labels:
+    app.kubernetes.io/name: phpmyadmin
+    app.kubernetes.io/component: database-admin
+    app.kubernetes.io/part-of: java-mysql-eks-platform
+
+spec:
+  replicas: 1
+
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: phpmyadmin
+
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: phpmyadmin
+        app.kubernetes.io/component: database-admin
+        app.kubernetes.io/part-of: java-mysql-eks-platform
+
+    spec:
+      nodeSelector:
+        workload-type: ec2
+
+      securityContext:
+        seccompProfile:
+          type: RuntimeDefault
+
+      containers:
+        - name: phpmyadmin
+          image: phpmyadmin:5.2.2-apache
+          imagePullPolicy: IfNotPresent
+
+          ports:
+            - name: http
+              containerPort: 80
+              protocol: TCP
+
+          env:
+            - name: PMA_HOST
+              value: mysql-primary.database.svc.cluster.local
+
+            - name: PMA_PORT
+              value: "3306"
+
+            - name: PMA_ARBITRARY
+              value: "0"
+
+          resources:
+            requests:
+              cpu: 50m
+              memory: 128Mi
+            limits:
+              cpu: 300m
+              memory: 256Mi
+
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 6
+
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+      restartPolicy: Always
