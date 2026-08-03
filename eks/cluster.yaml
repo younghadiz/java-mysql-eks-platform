@@ -1,0 +1,78 @@
+---
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: java-mysql-eks
+  region: ca-central-1
+  tags:
+    Project: java-mysql-eks-platform
+    Environment: training
+    ManagedBy: eksctl
+    Owner: younghadiz
+
+iam:
+  withOIDC: true
+
+vpc:
+  nat:
+    gateway: Disable
+
+  clusterEndpoints:
+    publicAccess: true
+    privateAccess: true
+
+  publicAccessCIDRs:
+    - YOUR_CURRENT_PUBLIC_IP/32
+    - YOUR_SECOND_PUBLIC_IP/32
+
+managedNodeGroups:
+  - name: application-nodes
+
+    instanceTypes:
+      - t3.medium
+
+    desiredCapacity: 3
+    minSize: 1
+    maxSize: 3
+
+    privateNetworking: false
+
+    volumeSize: 40
+    volumeType: gp3
+    volumeEncrypted: true
+
+    amiFamily: AmazonLinux2023
+
+    labels:
+      workload-type: ec2
+      lifecycle: on-demand
+
+    tags:
+      Project: java-mysql-eks-platform
+      WorkloadType: ec2
+
+    iam:
+      withAddonPolicies:
+        ebs: true
+        autoScaler: true
+        cloudWatch: true
+
+    updateConfig:
+      maxUnavailable: 1
+
+    ssh:
+      allow: false
+
+addons:
+  - name: vpc-cni
+  - name: coredns
+  - name: kube-proxy
+  - name: aws-ebs-csi-driver
+
+cloudWatch:
+  clusterLogging:
+    enableTypes:
+      - api
+      - audit
+      - authenticator

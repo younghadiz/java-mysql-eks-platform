@@ -1,0 +1,19 @@
+---
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: java-mysql-eks
+  region: ca-central-1
+
+fargateProfiles:
+  - name: java-app-fargate
+
+    selectors:
+      - namespace: java-app
+        labels:
+          compute-type: fargate
+
+    tags:
+      Project: java-mysql-eks-platform
+      WorkloadType: fargate

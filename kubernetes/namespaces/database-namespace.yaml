@@ -1,0 +1,8 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: database
+  labels:
+    app.kubernetes.io/part-of: java-mysql-eks-platform
+    compute-type: ec2
