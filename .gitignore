@@ -1,4 +1,68 @@
-.idea
-build
-out
-.gradle*
+# macOS
+.DS_Store
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+
+# Java and Maven
+target/
+*.class
+*.jar
+*.war
+
+# Environment files
+.env
+.env.*
+!.env.example
+
+# AWS credentials and configuration
+.aws/
+aws-credentials
+credentials
+*.pem
+*.key
+*.p12
+*.pfx
+
+# Kubernetes credentials
+.kube/
+kubeconfig*
+*.kubeconfig
+config.eks
+aws-auth-sensitive.yaml
+
+# eksctl generated credentials/configuration
+eksctl-generated/
+cluster-access/
+
+# Kubernetes Secrets
+kubernetes/**/secret.yaml
+kubernetes/**/*-secret.yaml
+kubernetes/**/*-secrets.yaml
+
+# Local Helm values
+**/values.local.yaml
+**/values.secret.yaml
+**/values.secrets.yaml
+
+# Jenkins local data
+jenkins_home/
+jenkins-data/
+
+# Terraform-style state files if added later
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Temporary files
+*.log
+*.tmp
+*.swp
+tmp/
+temp/
+
+# Rendered manifests
+rendered/
+*.rendered.yaml 
