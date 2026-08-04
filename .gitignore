@@ -71,3 +71,5 @@ rendered/
 eks/cluster.local.yaml
 
 kubernetes/database/mysql-values.local.yaml
+kubernetes/database/mysql-values.local.yaml
+kubernetes/application/secret.local.yaml

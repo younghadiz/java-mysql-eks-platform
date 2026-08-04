@@ -8,7 +8,7 @@ FROM eclipse-temurin:17-jdk-jammy AS builder
 WORKDIR /workspace
 
 # Copy Gradle Wrapper and build configuration first.
-# This allows Docker to cache dependency-related layers.
+# This improves Docker layer caching for dependencies.
 COPY gradlew gradlew.bat ./
 COPY gradle ./gradle
 COPY build.gradle settings.gradle ./
@@ -18,7 +18,7 @@ RUN chmod +x gradlew
 # Copy application source code.
 COPY src ./src
 
-# Build and test the Spring Boot application.
+# Build, test, and package the Spring Boot application.
 RUN ./gradlew clean test bootJar \
     --no-daemon \
     --stacktrace
@@ -32,28 +32,37 @@ LABEL org.opencontainers.image.title="Java MySQL EKS Application"
 LABEL org.opencontainers.image.description="Spring Boot application deployed to Amazon EKS"
 LABEL org.opencontainers.image.source="https://github.com/younghadiz/java-mysql-eks-platform"
 
-# Create a dedicated, non-root service account.
+# Fixed numeric IDs allow Kubernetes to verify that the
+# container is running as a non-root user.
+ARG APP_UID=10001
+ARG APP_GID=10001
+
+# Create a dedicated non-root runtime account.
 RUN groupadd \
-      --system \
+      --gid "${APP_GID}" \
       appgroup \
     && useradd \
-      --system \
-      --gid appgroup \
-      --home-dir /opt/app \
+      --uid "${APP_UID}" \
+      --gid "${APP_GID}" \
+      --no-create-home \
+      --home-dir /nonexistent \
       --shell /usr/sbin/nologin \
       appuser \
     && mkdir -p /opt/app \
-    && chown -R appuser:appgroup /opt/app
+    && chown "${APP_UID}:${APP_GID}" /opt/app
 
 WORKDIR /opt/app
 
 # Copy only the executable Spring Boot JAR.
+# Numeric ownership remains consistent with the Kubernetes
+# runAsUser and runAsGroup configuration.
 COPY --from=builder \
-    --chown=appuser:appgroup \
+    --chown=10001:10001 \
     /workspace/build/libs/application.jar \
     /opt/app/application.jar
 
-USER appuser
+# Run using explicit numeric UID and GID.
+USER 10001:10001
 
 EXPOSE 8080
 
