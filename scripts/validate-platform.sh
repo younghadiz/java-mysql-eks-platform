@@ -586,18 +586,18 @@ AUTOSCALER_SERVICE_ACCOUNT="$(
     --output=jsonpath='{.spec.template.spec.serviceAccountName}'
 )"
 
-[[ "${AUTOSCALER_SERVICE_ACCOUNT}" == "cluster-autoscaler" ]] \
-  || fail \
-    "Cluster Autoscaler uses ServiceAccount ${AUTOSCALER_SERVICE_ACCOUNT}; expected cluster-autoscaler."
+[[ -n "${AUTOSCALER_SERVICE_ACCOUNT}" ]] \
+  || fail "Cluster Autoscaler Deployment has no ServiceAccount configured."
 
 AUTOSCALER_ROLE_ARN="$(
-  kubectl get serviceaccount cluster-autoscaler \
+  kubectl get serviceaccount "${AUTOSCALER_SERVICE_ACCOUNT}" \
     --namespace kube-system \
     --output=jsonpath='{.metadata.annotations.eks\.amazonaws\.com/role-arn}'
 )"
 
 [[ -n "${AUTOSCALER_ROLE_ARN}" ]] \
-  || fail "Cluster Autoscaler ServiceAccount has no IRSA role annotation."
+  || fail \
+  "ServiceAccount ${AUTOSCALER_SERVICE_ACCOUNT} has no IRSA role annotation."
 
 kubectl get deployment,pods \
   --namespace kube-system \
