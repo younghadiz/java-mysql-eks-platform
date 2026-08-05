@@ -16,35 +16,24 @@ pipeline {
     }
 
     environment {
-        /*
-         * AWS configuration
-         */
         AWS_REGION = 'ca-central-1'
         EKS_CLUSTER_NAME = 'java-mysql-eks'
         ECR_REPOSITORY_NAME = 'java-mysql-app'
 
-        /*
-         * Kubernetes application configuration
-         */
         APP_NAME = 'java-app'
         APP_NAMESPACE = 'java-app'
         APP_DEPLOYMENT = 'java-app'
         EXPECTED_REPLICAS = '3'
 
-        /*
-         * Docker configuration
-         */
         DOCKER_BUILDER = 'jenkins-builder'
         TARGET_PLATFORM = 'linux/amd64'
+        JENKINS_CONTAINER_NAME = 'jenkins'
 
-        /*
-         * Populated during the pipeline
-         */
-        AWS_ACCOUNT_ID = ''
-        ECR_REGISTRY = ''
-        IMAGE_REPOSITORY = ''
-        IMAGE_TAG = ''
-        FULL_IMAGE_NAME = ''
+        AWS_ACCOUNT_ID = 'not-set'
+        ECR_REGISTRY = 'not-set'
+        IMAGE_REPOSITORY = 'not-set'
+        IMAGE_TAG = 'not-set'
+        FULL_IMAGE_NAME = 'not-set'
     }
 
     stages {
@@ -179,39 +168,77 @@ pipeline {
                     )
                 ]) {
                     script {
-                        env.AWS_ACCOUNT_ID = sh(
+                        String accountId = sh(
                             script: '''
                                 set -eu
 
                                 aws sts get-caller-identity \
-                                  --query Account \
+                                  --region "${AWS_REGION}" \
+                                  --query 'Account' \
                                   --output text
                             ''',
                             returnStdout: true
                         ).trim()
 
-                        env.ECR_REGISTRY =
-                            "${env.AWS_ACCOUNT_ID}.dkr.ecr.${env.AWS_REGION}.amazonaws.com"
+                        if (!accountId || accountId == 'None' || accountId == 'null') {
+                            error(
+                                'AWS account ID could not be determined. ' +
+                                'Check the Jenkins AWS credentials.'
+                            )
+                        }
 
-                        env.IMAGE_REPOSITORY =
-                            "${env.ECR_REGISTRY}/${env.ECR_REPOSITORY_NAME}"
+                        if (!env.GIT_COMMIT?.trim()) {
+                            env.GIT_COMMIT = sh(
+                                script: 'git rev-parse HEAD',
+                                returnStdout: true
+                            ).trim()
+                        }
 
-                        def shortCommit = env.GIT_COMMIT.take(7)
-
-                        /*
-                         * ECR image tags are immutable, so every Jenkins
-                         * build receives a unique version.
-                         */
-                        env.IMAGE_TAG =
+                        String shortCommit = env.GIT_COMMIT.take(7)
+                        String registry =
+                            "${accountId}.dkr.ecr.${env.AWS_REGION}.amazonaws.com"
+                        String repository =
+                            "${registry}/${env.ECR_REPOSITORY_NAME}"
+                        String imageTag =
                             "1.0.${env.BUILD_NUMBER}-${shortCommit}"
+                        String fullImage =
+                            "${repository}:${imageTag}"
 
-                        env.FULL_IMAGE_NAME =
-                            "${env.IMAGE_REPOSITORY}:${env.IMAGE_TAG}"
+                        env.AWS_ACCOUNT_ID = accountId
+                        env.ECR_REGISTRY = registry
+                        env.IMAGE_REPOSITORY = repository
+                        env.IMAGE_TAG = imageTag
+                        env.FULL_IMAGE_NAME = fullImage
 
                         echo "AWS account: ${env.AWS_ACCOUNT_ID}"
+                        echo "ECR registry: ${env.ECR_REGISTRY}"
                         echo "ECR repository: ${env.IMAGE_REPOSITORY}"
                         echo "Image tag: ${env.IMAGE_TAG}"
+                        echo "Full image: ${env.FULL_IMAGE_NAME}"
                     }
+
+                    sh '''
+                        set -eu
+
+                        echo "Validating calculated pipeline metadata..."
+
+                        : "${AWS_ACCOUNT_ID:?AWS_ACCOUNT_ID is missing}"
+                        : "${ECR_REGISTRY:?ECR_REGISTRY is missing}"
+                        : "${IMAGE_REPOSITORY:?IMAGE_REPOSITORY is missing}"
+                        : "${IMAGE_TAG:?IMAGE_TAG is missing}"
+                        : "${FULL_IMAGE_NAME:?FULL_IMAGE_NAME is missing}"
+
+                        aws sts get-caller-identity \
+                          --region "${AWS_REGION}" \
+                          --query '{
+                            Account:Account,
+                            Arn:Arn,
+                            UserId:UserId
+                          }' \
+                          --output table
+
+                        echo "Pipeline metadata validation passed."
+                    '''
                 }
             }
         }
