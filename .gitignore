@@ -1,4 +1,170 @@
-.idea
-build
-out
-.gradle*
+# ==========================================================
+# Operating System
+# ==========================================================
+
+# macOS
+.DS_Store
+
+# Linux
+*~
+
+# ==========================================================
+# IDEs & Editors
+# ==========================================================
+
+.vscode/
+.idea/
+*.iml
+
+# Vim
+*.swp
+*.swo
+
+# ==========================================================
+# Java / Gradle
+# ==========================================================
+
+# Build outputs
+build/
+target/
+out/
+
+# Compiled files
+*.class
+*.jar
+*.war
+*.ear
+
+# Gradle cache
+.gradle/
+
+# ==========================================================
+# Python
+# ==========================================================
+
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+.venv-security-check/
+venv/
+env/
+
+# ==========================================================
+# Environment Variables
+# ==========================================================
+
+.env
+.env.*
+!.env.example
+
+# ==========================================================
+# AWS Credentials
+# ==========================================================
+
+.aws/
+aws-credentials
+credentials
+
+*.pem
+*.key
+*.p12
+*.pfx
+
+# ==========================================================
+# Kubernetes
+# ==========================================================
+
+# kubeconfig
+.kube/
+kubeconfig*
+*.kubeconfig
+config.eks
+
+# Sensitive manifests
+aws-auth-sensitive.yaml
+
+kubernetes/**/secret.yaml
+kubernetes/**/*-secret.yaml
+kubernetes/**/*-secrets.yaml
+kubernetes/application/secret.local.yaml
+
+# Local Helm values
+**/values.local.yaml
+**/values.secret.yaml
+**/values.secrets.yaml
+
+# eksctl generated files
+eksctl-generated/
+cluster-access/
+eks/cluster.local.yaml
+
+# ==========================================================
+# Database Local Configuration
+# ==========================================================
+
+kubernetes/database/mysql-values.local.yaml
+
+# ==========================================================
+# Jenkins
+# ==========================================================
+
+jenkins_home/
+jenkins-data/
+
+# ==========================================================
+# Terraform
+# ==========================================================
+
+.terraform/
+
+*.tfstate
+*.tfstate.*
+*.tfvars
+*.tfvars.json
+
+crash.log
+crash.*.log
+
+terraform.tfstate.backup
+
+# ==========================================================
+# Docker
+# ==========================================================
+
+docker-compose.override.yml
+
+# ==========================================================
+# Rendered Kubernetes Manifests
+# ==========================================================
+
+rendered/
+*.rendered.yaml
+
+# ==========================================================
+# Logs & Temporary Files
+# ==========================================================
+
+*.log
+*.tmp
+*.temp
+
+tmp/
+temp/
+
+# ==========================================================
+# Test Reports
+# ==========================================================
+
+coverage/
+reports/
+test-results/
+
+# ==========================================================
+# Miscellaneous
+# ==========================================================
+
+.cache/
