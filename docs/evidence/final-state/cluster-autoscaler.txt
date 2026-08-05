@@ -1,0 +1,4 @@
+NAME                                                        READY   UP-TO-DATE   AVAILABLE   AGE
+deployment.apps/cluster-autoscaler-aws-cluster-autoscaler   1/1     1            1           128m
+NAME                                                             READY   STATUS    RESTARTS   AGE
+pod/cluster-autoscaler-aws-cluster-autoscaler-66d496586c-vbbn2   1/1     Running   0          64m

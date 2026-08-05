@@ -1,0 +1,4 @@
+PV                                         RECLAIM   STATUS   CLAIM-NAMESPACE   CLAIM-NAME
+pvc-0bed9fcf-6855-44fc-901f-dc76645bd8c4   Delete    Bound    database          data-mysql-primary-0
+pvc-38c13532-5876-4838-ad58-1c05673279ce   Delete    Bound    database          data-mysql-secondary-1
+pvc-4caf3139-380e-41ce-8bdf-f095e731d4fd   Delete    Bound    database          data-mysql-secondary-0

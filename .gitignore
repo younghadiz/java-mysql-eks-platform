@@ -273,3 +273,8 @@ node_modules/
 # Local shell history
 .zsh_history
 .bash_history
+
+# Local database backups
+backups/
+*.sql
+*.sql.gz

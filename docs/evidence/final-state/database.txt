@@ -1,0 +1,24 @@
+NAME                               READY   AGE   CONTAINERS   IMAGES
+statefulset.apps/mysql-primary     1/1     32h   mysql        docker.io/bitnamilegacy/mysql:9.4.0-debian-12-r1
+statefulset.apps/mysql-secondary   2/2     32h   mysql        docker.io/bitnamilegacy/mysql:9.4.0-debian-12-r1
+
+NAME                         READY   UP-TO-DATE   AVAILABLE   AGE   CONTAINERS   IMAGES                    SELECTOR
+deployment.apps/phpmyadmin   1/1     1            1           35h   phpmyadmin   phpmyadmin:5.2.2-apache   app.kubernetes.io/name=phpmyadmin
+
+NAME                              READY   STATUS    RESTARTS   AGE    IP               NODE                                              NOMINATED NODE   READINESS GATES
+pod/mysql-primary-0               1/1     Running   0          32h    192.168.3.126    ip-192-168-24-144.ca-central-1.compute.internal   <none>           <none>
+pod/mysql-secondary-0             1/1     Running   0          120m   192.168.78.62    ip-192-168-85-145.ca-central-1.compute.internal   <none>           <none>
+pod/mysql-secondary-1             1/1     Running   0          32h    192.168.37.163   ip-192-168-33-89.ca-central-1.compute.internal    <none>           <none>
+pod/phpmyadmin-579dc877fd-l84xk   1/1     Running   0          35h    192.168.45.180   ip-192-168-33-89.ca-central-1.compute.internal    <none>           <none>
+
+NAME                               TYPE        CLUSTER-IP      EXTERNAL-IP   PORT(S)    AGE   SELECTOR
+service/mysql-primary              ClusterIP   10.100.99.177   <none>        3306/TCP   32h   app.kubernetes.io/component=primary,app.kubernetes.io/instance=mysql,app.kubernetes.io/name=mysql,app.kubernetes.io/part-of=mysql
+service/mysql-primary-headless     ClusterIP   None            <none>        3306/TCP   32h   app.kubernetes.io/component=primary,app.kubernetes.io/instance=mysql,app.kubernetes.io/name=mysql
+service/mysql-secondary            ClusterIP   10.100.100.18   <none>        3306/TCP   32h   app.kubernetes.io/component=secondary,app.kubernetes.io/instance=mysql,app.kubernetes.io/name=mysql
+service/mysql-secondary-headless   ClusterIP   None            <none>        3306/TCP   32h   app.kubernetes.io/component=secondary,app.kubernetes.io/instance=mysql,app.kubernetes.io/name=mysql,app.kubernetes.io/part-of=mysql
+service/phpmyadmin                 ClusterIP   10.100.48.84    <none>        8081/TCP   35h   app.kubernetes.io/name=phpmyadmin
+
+NAME                                           STATUS   VOLUME                                     CAPACITY   ACCESS MODES   STORAGECLASS   VOLUMEATTRIBUTESCLASS   AGE   VOLUMEMODE
+persistentvolumeclaim/data-mysql-primary-0     Bound    pvc-0bed9fcf-6855-44fc-901f-dc76645bd8c4   8Gi        RWO            gp3            <unset>                 32h   Filesystem
+persistentvolumeclaim/data-mysql-secondary-0   Bound    pvc-4caf3139-380e-41ce-8bdf-f095e731d4fd   8Gi        RWO            gp3            <unset>                 32h   Filesystem
+persistentvolumeclaim/data-mysql-secondary-1   Bound    pvc-38c13532-5876-4838-ad58-1c05673279ce   8Gi        RWO            gp3            <unset>                 32h   Filesystem
