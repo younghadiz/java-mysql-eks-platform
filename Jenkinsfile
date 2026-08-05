@@ -136,11 +136,17 @@ pipeline {
 
                     echo "Running Gradle tests with Java 17..."
 
+                    echo "Jenkins workspace:"
+                    echo "${WORKSPACE}"
+
+                    test -f "${WORKSPACE}/gradlew"
+                    test -f "${WORKSPACE}/gradle/wrapper/gradle-wrapper.jar"
+
                     docker run \
                       --rm \
+                      --volumes-from jenkins \
                       --user "$(id -u):$(id -g)" \
-                      --volume "${WORKSPACE}:/workspace" \
-                      --workdir /workspace \
+                      --workdir "${WORKSPACE}" \
                       --env GRADLE_USER_HOME=/tmp/gradle-cache \
                       eclipse-temurin:17-jdk-jammy \
                       ./gradlew \
