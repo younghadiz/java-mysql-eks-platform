@@ -382,10 +382,8 @@ pipeline {
 
                         export KUBECONFIG="${WORKSPACE}/.kube/config"
 
-                        /*
-                         * Do not manually Base64-encode these values.
-                         * kubectl create secret performs the encoding.
-                         */
+                        # Do not manually Base64-encode these values.
+                        # kubectl creates and encodes the Kubernetes Secret.
                         kubectl create secret generic java-app-secret \
                           --namespace "${APP_NAMESPACE}" \
                           --from-literal=DB_USER="${DB_USER_SECRET}" \
@@ -393,6 +391,15 @@ pipeline {
                           --dry-run=client \
                           --output=yaml \
                         | kubectl apply -f -
+
+                        echo "Application Secret was created or updated successfully."
+
+                        kubectl get secret java-app-secret \
+                          --namespace "${APP_NAMESPACE}" \
+                          --output custom-columns='NAME:.metadata.name,TYPE:.type,KEYS:.data' \
+                        | sed \
+                            -E \
+                            's/(DB_USER|DB_PWD):[^,}]*/\\1:<redacted>/g'
                     '''
                 }
             }
