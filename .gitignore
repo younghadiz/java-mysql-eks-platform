@@ -4,9 +4,17 @@
 
 # macOS
 .DS_Store
+.AppleDouble
+.LSOverride
+._*
 
 # Linux
 *~
+.Trash-*
+
+# Windows
+Thumbs.db
+Desktop.ini
 
 # ==========================================================
 # IDEs & Editors
@@ -15,31 +23,43 @@
 .vscode/
 .idea/
 *.iml
+*.ipr
+*.iws
 
 # Vim
 *.swp
 *.swo
+*.swn
+
+# VS Code local history
+.history/
 
 # ==========================================================
 # Java / Gradle
 # ==========================================================
 
+# Gradle local cache and generated state
+.gradle/
+
 # Build outputs
 build/
 target/
 out/
+bin/
 
-# Compiled files
+# Compiled and packaged artifacts
 *.class
 *.jar
 *.war
 *.ear
 
-# The Gradle Wrapper JAR is required for reproducible CI/CD builds.
+# The Gradle Wrapper JAR must remain committed for CI/CD.
 !gradle/wrapper/gradle-wrapper.jar
 
-# Gradle cache
-.gradle/
+# Gradle-generated logs and reports
+.gradle-build/
+hs_err_pid*
+replay_pid*
 
 # ==========================================================
 # Python
@@ -49,23 +69,38 @@ __pycache__/
 *.py[cod]
 *.pyo
 *.pyd
+*.so
 
 # Virtual environments
 .venv/
 .venv-security-check/
 venv/
 env/
+ENV/
+
+# Python tooling
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
 
 # ==========================================================
-# Environment Variables
+# Environment Variables and Local Configuration
 # ==========================================================
 
 .env
 .env.*
 !.env.example
 
+*.local
+*.local.*
+*.secret
+*.secrets
+
 # ==========================================================
-# AWS Credentials
+# AWS Credentials and Local AWS Configuration
 # ==========================================================
 
 .aws/
@@ -76,40 +111,54 @@ credentials
 *.key
 *.p12
 *.pfx
+*.crt
+*.cer
+
+# Temporary rendered IAM policies
+jenkins-access-key.json
+jenkins-eks-policy.rendered.json
 
 # ==========================================================
 # Kubernetes
 # ==========================================================
 
-# kubeconfig
+# kubeconfig files
 .kube/
 kubeconfig*
 *.kubeconfig
 config.eks
 
-# Sensitive manifests
+# Sensitive Kubernetes manifests
 aws-auth-sensitive.yaml
 
 kubernetes/**/secret.yaml
 kubernetes/**/*-secret.yaml
 kubernetes/**/*-secrets.yaml
+kubernetes/**/secret.local.yaml
+kubernetes/**/*-secret.local.yaml
 kubernetes/application/secret.local.yaml
 
 # Local Helm values
 **/values.local.yaml
 **/values.secret.yaml
 **/values.secrets.yaml
+**/*-values.local.yaml
+**/*-values.secret.yaml
 
-# eksctl generated files
+# eksctl generated or local files
 eksctl-generated/
 cluster-access/
 eks/cluster.local.yaml
+eks/*.local.yaml
 
 # ==========================================================
 # Database Local Configuration
 # ==========================================================
 
 kubernetes/database/mysql-values.local.yaml
+*.sql.local
+*.dump
+*.dump.gz
 
 # ==========================================================
 # Jenkins
@@ -117,12 +166,20 @@ kubernetes/database/mysql-values.local.yaml
 
 jenkins_home/
 jenkins-data/
+jenkins-backups/
+jenkins-image-backup/
+
+# Jenkins local secrets and exports
+jenkins-access-key.json
+jenkins-credentials/
+jenkins-secrets/
 
 # ==========================================================
 # Terraform
 # ==========================================================
 
 .terraform/
+.terraform.lock.hcl.backup
 
 *.tfstate
 *.tfstate.*
@@ -134,11 +191,26 @@ crash.*.log
 
 terraform.tfstate.backup
 
+# Override files are often local-only
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform plan files
+*.tfplan
+tfplan
+
 # ==========================================================
 # Docker
 # ==========================================================
 
 docker-compose.override.yml
+docker-compose.override.yaml
+
+# Local Docker environment/configuration
+.docker/
+docker-data/
 
 # ==========================================================
 # Rendered Kubernetes Manifests
@@ -146,6 +218,7 @@ docker-compose.override.yml
 
 rendered/
 *.rendered.yaml
+*.rendered.yml
 
 # ==========================================================
 # Logs & Temporary Files
@@ -154,20 +227,49 @@ rendered/
 *.log
 *.tmp
 *.temp
+*.bak
+*.backup
+*.orig
 
 tmp/
 temp/
 
 # ==========================================================
-# Test Reports
+# Test Reports and Coverage
 # ==========================================================
 
 coverage/
 reports/
 test-results/
+test-results-*/
+junit-results/
+surefire-reports/
+
+# ==========================================================
+# Security and Scanner Output
+# ==========================================================
+
+trivy-results/
+trivy-report.*
+dependency-check-report.*
+security-reports/
+scan-results/
 
 # ==========================================================
 # Miscellaneous
 # ==========================================================
 
 .cache/
+.npm/
+.node_modules/
+node_modules/
+
+# Archive files
+*.zip
+*.tar
+*.tar.gz
+*.tgz
+
+# Local shell history
+.zsh_history
+.bash_history
