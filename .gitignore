@@ -35,6 +35,9 @@ out/
 *.war
 *.ear
 
+# The Gradle Wrapper JAR is required for reproducible CI/CD builds.
+!gradle/wrapper/gradle-wrapper.jar
+
 # Gradle cache
 .gradle/
 

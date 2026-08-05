@@ -81,7 +81,19 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                checkout scm
+                script {
+                    def scmVars = checkout scm
+
+                    env.GIT_COMMIT = scmVars.GIT_COMMIT ?: sh(
+                        script: 'git rev-parse HEAD',
+                        returnStdout: true
+                    ).trim()
+
+                    env.GIT_BRANCH_NAME = env.BRANCH_NAME ?: sh(
+                        script: 'git rev-parse --abbrev-ref HEAD',
+                        returnStdout: true
+                    ).trim()
+                }
 
                 sh '''
                     set -eu
@@ -89,8 +101,8 @@ pipeline {
                     echo "=========================================="
                     echo "Repository checkout information"
                     echo "=========================================="
-                    echo "Branch: ${BRANCH_NAME:-unknown}"
-                    echo "Commit: ${GIT_COMMIT:-unknown}"
+                    echo "Branch: ${GIT_BRANCH_NAME}"
+                    echo "Commit: ${GIT_COMMIT}"
                     echo "Build number: ${BUILD_NUMBER}"
                     echo
 
@@ -355,6 +367,10 @@ pipeline {
 
                         env.ECR_REPO_URL =
                             "${env.ECR_REGISTRY}/${env.ECR_REPOSITORY_NAME}"
+
+                        if (!env.GIT_COMMIT?.trim()) {
+                            error('GIT_COMMIT is empty after checkout.')
+                        }
 
                         def shortCommit = env.GIT_COMMIT.take(7)
 
@@ -702,11 +718,9 @@ pipeline {
 
                         echo "Creating or updating java-app-secret..."
 
-                        /*
-                         * The Java application expects DB_USER and DB_PWD.
-                         * The values are read from Jenkins credentials and
-                         * are never written into the Git repository.
-                         */
+                        # The Java application expects DB_USER and DB_PWD.
+                        # Values come from Jenkins credentials and are not
+                        # stored in Git.
                         kubectl create secret generic java-app-secret \
                           --namespace "${K8S_NAMESPACE}" \
                           --from-literal=DB_USER="${DB_USER}" \
