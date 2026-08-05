@@ -8,15 +8,23 @@ autoDiscovery:
 rbac:
   create: true
 
-serviceAccount:
-  create: false
-  name: cluster-autoscaler
+  serviceAccount:
+    # The ServiceAccount was created by eksctl with an IRSA role.
+    create: false
+    name: cluster-autoscaler
 
 replicaCount: 1
 
 image:
   repository: registry.k8s.io/autoscaling/cluster-autoscaler
-  tag: v1.35.0
+
+  # Cluster Autoscaler major/minor should match the EKS
+  # Kubernetes major/minor version.
+  #
+  # EKS Kubernetes: 1.34
+  # Cluster Autoscaler: 1.34
+  tag: v1.34.3
+
   pullPolicy: IfNotPresent
 
 extraArgs:
@@ -39,6 +47,7 @@ resources:
   requests:
     cpu: 100m
     memory: 300Mi
+
   limits:
     cpu: 500m
     memory: 600Mi
@@ -47,12 +56,14 @@ securityContext:
   runAsNonRoot: true
   runAsUser: 65534
   runAsGroup: 65534
+
   seccompProfile:
     type: RuntimeDefault
 
 containerSecurityContext:
   allowPrivilegeEscalation: false
   readOnlyRootFilesystem: true
+
   capabilities:
     drop:
-      - ALL
+      - ALL 
